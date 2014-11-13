@@ -21,7 +21,6 @@ import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -29,7 +28,6 @@ import javax.annotation.PreDestroy;
 /**
  * @author Frank Asseg
  */
-@Component
 public class ElasticSearchNode {
 
     private Node node;

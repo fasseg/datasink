@@ -15,8 +15,10 @@
  */
 package org.datasink.server;
 
+import org.elasticsearch.client.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -35,5 +37,15 @@ public class ServerConfiguration {
 
     @Autowired
     private Environment env;
+
+    @Bean
+    public ElasticSearchNode elasticSearchNode() {
+        return new ElasticSearchNode();
+    }
+
+    @Bean
+    public Client elasticSearchClient() {
+        return elasticSearchNode().getClient();
+    }
 
 }
