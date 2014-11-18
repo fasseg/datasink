@@ -48,4 +48,14 @@ public class ServerConfiguration {
         return elasticSearchNode().getClient();
     }
 
+    @Bean
+    public SeaweedFsMaster weedFsMaster() {
+        return new SeaweedFsMaster();
+    }
+
+    @Bean
+    public SeaweedFsVolume weedFsVolume() {
+        return new SeaweedFsVolume();
+    }
+
 }
