@@ -24,6 +24,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.io.IOException;
@@ -42,10 +43,11 @@ public class DatasetController {
     @Autowired
     private ObjectMapper mapper;
 
-    @RequestMapping(value = "/{id}/{version}", produces = "application/json", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}", produces = "application/json", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public Dataset retrieveDataset(@PathVariable("id") final String id, @PathVariable("version") final int version) throws IOException {
-        return indexService.retrieve(id, version);
+    @ResponseBody
+    public Dataset retrieveDataset(@PathVariable("id") final String id) throws IOException {
+        return indexService.retrieve(id);
     }
 
     @RequestMapping(method = RequestMethod.POST, produces = "application/json")

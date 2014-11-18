@@ -15,39 +15,41 @@
  */
 package org.datasink.server.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import javax.annotation.PostConstruct;
+
 import org.datasink.Dataset;
 import org.datasink.server.service.IndexService;
 import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.client.Client;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
 
 /**
  * IndexService implementation for ElasticSearch
  * @author Frank Asseg
  */
 @Service
-public class ElasticSearchIndexService implements IndexService {
+public class ElasticSearchIndexService extends AbstractElasticSearchService  implements IndexService {
 
     private static final Logger log = LoggerFactory.getLogger(ElasticSearchIndexService.class);
 
     public static final String INDEX_NAME="datasets";
     public static final String INDEX_TYPE="dataset";
 
-    @Autowired
-    private Client client;
 
-    @Autowired
-    private ObjectMapper mapper;
+    @PostConstruct
+    public void init() {
+        if (!this.indexExists(INDEX_NAME)) {
+            this.createIndex(INDEX_NAME);
+            this.waitForIndex(INDEX_NAME);
+        }
+    }
 
     @Override
-    public void saveOrUpdate(Dataset ds) throws IOException {
+    public void saveOrUpdate(final Dataset ds) throws IOException {
 
         if (this.exists(ds.getId())) {
             log.debug("Updating existing dataset record " + ds.getId());
@@ -60,14 +62,16 @@ public class ElasticSearchIndexService implements IndexService {
                 .setSource(this.mapper.writeValueAsBytes(ds))
                 .execute()
                 .actionGet();
+
+        // refresh the index so the new record is available
+        this.refreshIndex(INDEX_NAME);
     }
 
     @Override
-    public void delete(final String id, int version) throws IOException {
-        if (!this.versionExists(id, version)) {
-            throw new FileNotFoundException("Dataset " + id + " with version " + version + " can not be found");
-        }
-        this.client.prepareDelete(INDEX_NAME, INDEX_TYPE, id);
+    public void delete(final String id) throws IOException {
+        this.client.prepareDelete(INDEX_NAME, INDEX_TYPE, id)
+            .execute()
+            .actionGet();
     }
 
     @Override
@@ -76,8 +80,8 @@ public class ElasticSearchIndexService implements IndexService {
     }
 
     @Override
-    public Dataset retrieve(final String id, final int version) throws IOException {
-        final GetResponse get = this.client.prepareGet(INDEX_NAME, INDEX_TYPE, id + "::" + version)
+    public Dataset retrieve(final String id) throws IOException {
+        final GetResponse get = this.client.prepareGet(INDEX_NAME, INDEX_TYPE, id)
                 .execute()
                 .actionGet();
 

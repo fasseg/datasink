@@ -13,11 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
-package org.datasink.service;
+package org.datasink.server.service.impl;
+
+import org.datasink.server.service.ReportService;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Frank Asseg
  */
-public interface ReportService {
-    String version();
+@Service
+public class DefaultReportService implements ReportService{
+
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
+    @Override
+    public String version() {
+        return "foo";
+    }
 }

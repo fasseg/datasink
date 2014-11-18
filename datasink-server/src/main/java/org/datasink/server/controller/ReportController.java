@@ -15,7 +15,7 @@
  */
 package org.datasink.server.controller;
 
-import org.datasink.service.ReportService;
+import org.datasink.server.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;

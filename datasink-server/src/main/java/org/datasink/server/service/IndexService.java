@@ -11,9 +11,9 @@ import java.io.IOException;
 public interface IndexService {
     void saveOrUpdate(Dataset ds) throws IOException;
 
-    Dataset retrieve(final String id, final int version) throws IOException;
+    Dataset retrieve(final String id) throws IOException;
 
-    void delete(final String id, final int version) throws IOException;
+    void delete(final String id) throws IOException;
 
     boolean versionExists(String id, final int version) throws IOException;
 

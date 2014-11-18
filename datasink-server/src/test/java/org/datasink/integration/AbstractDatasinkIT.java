@@ -42,8 +42,9 @@ import java.io.IOException;
 @WebAppConfiguration
 public class AbstractDatasinkIT {
     private final String hostName = "localhost";
+    private final String contextPath = "/datasink";
     private final int port = 8080;
-    private final String serverUrl = "http://" + hostName + ":" + port;
+    private final String serverUrl = "http://" + hostName + ":" + port + contextPath;
     private final String username = "admin";
     private final String password = username;
     private final Executor executor;
@@ -61,6 +62,11 @@ public class AbstractDatasinkIT {
     protected HttpResponse postDataset(final Dataset ds) throws IOException {
         return this.executor.execute(Request.Post(serverUrl + "/dataset")
                     .bodyString(this.mapper.writeValueAsString(ds), ContentType.APPLICATION_JSON))
+                .returnResponse();
+    }
+
+    public HttpResponse retrieveDataset(final String id) throws IOException {
+        return this.executor.execute(Request.Get(serverUrl + "/dataset/" + id))
                 .returnResponse();
     }
 }
