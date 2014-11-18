@@ -16,7 +16,7 @@
 package org.datasink.server.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.datasink.Dataset;
+import org.datasink.DataSetVersion;
 import org.datasink.server.service.IndexService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -46,17 +46,14 @@ public class DatasetController {
     @RequestMapping(value = "/{id}", produces = "application/json", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public Dataset retrieveDataset(@PathVariable("id") final String id) throws IOException {
+    public DataSetVersion retrieveDataset(@PathVariable("id") final String id) throws IOException {
         return indexService.retrieve(id);
     }
 
     @RequestMapping(method = RequestMethod.POST, produces = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
     public void createDataset(final InputStream src) throws IOException {
-        final Dataset ds = this.mapper.readValue(src, Dataset.class);
-        if (indexService.exists(ds.getId())) {
-            throw new IOException("Dataset already exists");
-        }
+        final DataSetVersion ds = this.mapper.readValue(src, DataSetVersion.class);
         this.indexService.saveOrUpdate(ds);
     }
 

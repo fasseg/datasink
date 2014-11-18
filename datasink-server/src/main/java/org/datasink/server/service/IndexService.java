@@ -1,6 +1,7 @@
 package org.datasink.server.service;
 
-import org.datasink.Dataset;
+import org.datasink.DataSetVersion;
+import org.datasink.DataSet;
 
 import java.io.IOException;
 
@@ -9,13 +10,17 @@ import java.io.IOException;
  * @author Frank Asseg
  */
 public interface IndexService {
-    void saveOrUpdate(Dataset ds) throws IOException;
+    void saveOrUpdate(DataSetVersion ds) throws IOException;
 
-    Dataset retrieve(final String id) throws IOException;
+    DataSetVersion retrieve(final String id) throws IOException;
+
+    DataSet retrieveDataset(final String id) throws IOException;
 
     void delete(final String id) throws IOException;
 
     boolean versionExists(String id, final int version) throws IOException;
 
     boolean exists(final String id) throws IOException;
+
+    int lastVersionOf(String id) throws IOException;
 }

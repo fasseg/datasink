@@ -15,7 +15,6 @@
  */
 package org.datasink;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
@@ -23,14 +22,22 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
  * The basic unit of storage in Datasink
  * @author Frank Asseg
  */
-@JsonDeserialize(builder = Dataset.Builder.class)
-public class Dataset {
+@JsonDeserialize(builder = DataSetVersion.Builder.class)
+public class DataSetVersion {
 
     private final String id;
     private final String label;
     private final int version;
 
-    private Dataset(Builder builder) {
+    public DataSetVersion newVersion(int version) {
+        return new Builder()
+                .id(id)
+                .label(label)
+                .version(version)
+                .build();
+    }
+
+    private DataSetVersion(Builder builder) {
         this.id = builder.id;
         this.label = builder.label;
         this.version = builder.version;
@@ -72,11 +79,11 @@ public class Dataset {
             return this;
         }
 
-        public Dataset build() {
+        public DataSetVersion build() {
             if (id == null || id.isEmpty()) {
                 throw new IllegalArgumentException("Dataset identifier can not be empty");
             }
-            return new Dataset(this);
+            return new DataSetVersion(this);
         }
     }
 }

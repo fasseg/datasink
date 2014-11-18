@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.util.EntityUtils;
-import org.datasink.Dataset;
+import org.datasink.DataSetVersion;
 import org.datasink.test.fixtures.Fixtures;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,8 +43,28 @@ public class DatasetIT extends AbstractDatasinkIT {
     }
 
     @Test
+    public void testAddVersion() throws Exception {
+        final DataSetVersion ds = Fixtures.randomDataset();
+
+        HttpResponse resp =  this.postDataset(ds);
+        assertEquals(EntityUtils.toString(resp.getEntity()), HttpStatus.SC_CREATED, resp.getStatusLine().getStatusCode());
+
+        resp =  this.postDataset(ds);
+        assertEquals(EntityUtils.toString(resp.getEntity()), HttpStatus.SC_CREATED, resp.getStatusLine().getStatusCode());
+
+        resp = this.retrieveDataset(ds.getId());
+        assertEquals(EntityUtils.toString(resp.getEntity()), HttpStatus.SC_OK, resp.getStatusLine().getStatusCode());
+
+        final DataSetVersion fetched = this.mapper.readValue(resp.getEntity().getContent(), DataSetVersion.class);
+        assertNotNull(fetched);
+        assertEquals(ds.getId(), fetched.getId());
+        assertEquals(ds.getLabel(), fetched.getLabel());
+        assertEquals(2, fetched.getVersion());
+    }
+
+    @Test
     public void testRetrieve() throws Exception {
-        final Dataset ds = Fixtures.randomDataset();
+        final DataSetVersion ds = Fixtures.randomDataset();
 
         HttpResponse resp =  this.postDataset(ds);
         assertEquals(EntityUtils.toString(resp.getEntity()), HttpStatus.SC_CREATED, resp.getStatusLine().getStatusCode());
@@ -52,7 +72,7 @@ public class DatasetIT extends AbstractDatasinkIT {
         resp = this.retrieveDataset(ds.getId());
         assertEquals(EntityUtils.toString(resp.getEntity()), HttpStatus.SC_OK, resp.getStatusLine().getStatusCode());
 
-        final Dataset fetched = this.mapper.readValue(resp.getEntity().getContent(), Dataset.class);
+        final DataSetVersion fetched = this.mapper.readValue(resp.getEntity().getContent(), DataSetVersion.class);
         assertNotNull(fetched);
         assertEquals(ds.getId(), fetched.getId());
         assertEquals(ds.getLabel(), fetched.getLabel());
@@ -61,7 +81,7 @@ public class DatasetIT extends AbstractDatasinkIT {
 
     @Test
     public void testDelete() throws Exception {
-        final Dataset ds = Fixtures.randomDataset();
+        final DataSetVersion ds = Fixtures.randomDataset();
         HttpResponse resp =  this.postDataset(ds);
         assertEquals(EntityUtils.toString(resp.getEntity()), HttpStatus.SC_CREATED, resp.getStatusLine().getStatusCode());
 

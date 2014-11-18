@@ -21,7 +21,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Executor;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
-import org.datasink.Dataset;
+import org.datasink.DataSetVersion;
 import org.datasink.server.SecurityConfiguration;
 import org.datasink.server.ServerConfiguration;
 import org.junit.runner.RunWith;
@@ -59,7 +59,7 @@ public class AbstractDatasinkIT {
                 .authPreemptive(local);
     }
 
-    protected HttpResponse postDataset(final Dataset ds) throws IOException {
+    protected HttpResponse postDataset(final DataSetVersion ds) throws IOException {
         return this.executor.execute(Request.Post(serverUrl + "/dataset")
                     .bodyString(this.mapper.writeValueAsString(ds), ContentType.APPLICATION_JSON))
                 .returnResponse();
