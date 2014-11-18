@@ -59,4 +59,10 @@ public class DatasetController {
         }
         this.indexService.saveOrUpdate(ds);
     }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteDataset(@PathVariable("id") final String id) throws IOException {
+        this.indexService.delete(id);
+    }
 }

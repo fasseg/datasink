@@ -55,6 +55,14 @@ public class ElasticSearchNode {
                             .put("gateway.type",env.getProperty("elasticsearch.gateway.type"))
                         )
                         .node();
+
+        // wait for the cluster to become active
+        this.node.client().admin()
+                .cluster()
+                .prepareHealth()
+                .setWaitForYellowStatus()
+                .execute()
+                .actionGet();
     }
 
     @PreDestroy

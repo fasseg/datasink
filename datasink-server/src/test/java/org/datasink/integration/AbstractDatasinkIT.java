@@ -69,4 +69,9 @@ public class AbstractDatasinkIT {
         return this.executor.execute(Request.Get(serverUrl + "/dataset/" + id))
                 .returnResponse();
     }
+
+    public HttpResponse deleteDataset(final String id) throws IOException{
+        return this.executor.execute(Request.Delete(serverUrl + "/dataset/" + id))
+                .returnResponse();
+    }
 }

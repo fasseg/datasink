@@ -17,9 +17,12 @@ package org.datasink.server.service.impl;
 
 import java.io.IOException;
 
+import org.apache.catalina.Cluster;
 import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
+import org.elasticsearch.action.admin.indices.flush.FlushRequest;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.client.Client;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +54,6 @@ public abstract class AbstractElasticSearchService {
 
     protected boolean indexExists(final String indexName) {
         try {
-
             return client.admin()
                     .indices()
                     .exists(new IndicesExistsRequest(indexName))
@@ -81,4 +83,5 @@ public abstract class AbstractElasticSearchService {
             throw new RuntimeException(ex);
         }
     }
+
 }

@@ -58,4 +58,14 @@ public class DatasetIT extends AbstractDatasinkIT {
         assertEquals(ds.getLabel(), fetched.getLabel());
         assertEquals(ds.getVersion(), fetched.getVersion());
     }
+
+    @Test
+    public void testDelete() throws Exception {
+        final Dataset ds = Fixtures.randomDataset();
+        HttpResponse resp =  this.postDataset(ds);
+        assertEquals(EntityUtils.toString(resp.getEntity()), HttpStatus.SC_CREATED, resp.getStatusLine().getStatusCode());
+
+        resp = this.deleteDataset(ds.getId());
+        assertEquals(EntityUtils.toString(resp.getEntity()), HttpStatus.SC_OK, resp.getStatusLine().getStatusCode());
+    }
 }
