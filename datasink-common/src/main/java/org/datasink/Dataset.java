@@ -15,68 +15,51 @@
  */
 package org.datasink;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import java.util.Map;
 
 /**
  * The basic unit of storage in Datasink
+ *
  * @author Frank Asseg
  */
-@JsonDeserialize(builder = Dataset.Builder.class)
 public class Dataset {
 
-    private final String id;
-    private final String label;
-    private final int version;
-
-    private Dataset(Builder builder) {
-        this.id = builder.id;
-        this.label = builder.label;
-        this.version = builder.version;
-    }
+    private String id;
+    private String label;
+    private int version;
+    private Map<Integer, String> versions;
 
     public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getLabel() {
         return label;
     }
 
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
     public int getVersion() {
         return version;
     }
 
-    public static class Builder {
+    public void setVersion(int version) {
+        this.version = version;
+    }
 
-        private String id;
-        private String label;
-        private int version;
+    public Map<Integer, String> getVersions() {
+        return versions;
+    }
 
-        @JsonProperty("id")
-        public Builder id(final String id) {
-            this.id = id;
-            return this;
-        }
-
-        @JsonProperty("label")
-        public Builder label(final String label) {
-            this.label = label;
-            return this;
-        }
-
-        @JsonProperty("version")
-        public Builder version(final int version) {
-            this.version = version;
-            return this;
-        }
-
-        public Dataset build() {
-            if (id == null || id.isEmpty()) {
-                throw new IllegalArgumentException("Dataset identifier can not be empty");
-            }
-            return new Dataset(this);
-        }
+    public void setVersions(Map<Integer, String> versions) {
+        this.versions = versions;
     }
 }

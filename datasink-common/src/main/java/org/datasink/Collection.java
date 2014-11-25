@@ -15,42 +15,39 @@
  */
 package org.datasink;
 
+import java.util.List;
+
 /**
  * A Collection aggregates multiple Datasets
+ *
  * @author Frank Asseg
  */
 public class Collection {
-    private final String id;
-    private final String label;
+    private String id;
+    private String label;
+    private List<String> datasetIds;
 
-    private Collection(Builder builder) {
-        this.id = builder.id;
-        this.label = builder.label;
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getLabel() {
         return label;
     }
 
-    public String getId() {
-        return id;
+    public void setLabel(String label) {
+        this.label = label;
     }
 
-    public static class Builder {
-        private final String id;
-        private String label;
+    public List<String> getDatasetIds() {
+        return datasetIds;
+    }
 
-        public Builder(final String id) {
-            this.id = id;
-        }
-
-        public Builder label(final String label) {
-            this.label = label;
-            return this;
-        }
-
-        public Collection build() {
-            return new Collection(this);
-        }
+    public void setDatasetIds(List<String> datasetIds) {
+        this.datasetIds = datasetIds;
     }
 }

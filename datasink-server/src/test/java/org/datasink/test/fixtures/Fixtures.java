@@ -25,9 +25,9 @@ import java.io.IOException;
  */
 public final class Fixtures {
     public static final Dataset randomDataset() throws IOException {
-        return new Dataset.Builder()
-                .id("ds_" + RandomStringUtils.randomAlphabetic(8))
-                .label("My Label [" + RandomStringUtils.randomAlphabetic(8))
-                .build();
+        final Dataset ds = new Dataset();
+        ds.setId("ds_" + RandomStringUtils.randomAlphabetic(8));
+        ds.setLabel("My Label [" + RandomStringUtils.randomAlphabetic(8) + "]");
+        return ds;
     }
 }
