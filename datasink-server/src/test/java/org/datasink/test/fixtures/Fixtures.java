@@ -17,6 +17,7 @@ package org.datasink.test.fixtures;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.datasink.Dataset;
+import org.datasink.DatasetVersion;
 
 import java.io.IOException;
 
@@ -24,10 +25,10 @@ import java.io.IOException;
  * @author Frank Asseg
  */
 public final class Fixtures {
-    public static final Dataset randomDataset() throws IOException {
-        final Dataset ds = new Dataset();
-        ds.setId("ds_" + RandomStringUtils.randomAlphabetic(8));
-        ds.setLabel("My Label [" + RandomStringUtils.randomAlphabetic(8) + "]");
-        return ds;
+    public static final DatasetVersion randomDataset() throws IOException {
+        final DatasetVersion version = new DatasetVersion();
+        version.setDatasetId("ds_" + RandomStringUtils.randomAlphabetic(16));
+        version.setVersionId("version_" + RandomStringUtils.randomAlphabetic(16));
+        return version;
     }
 }

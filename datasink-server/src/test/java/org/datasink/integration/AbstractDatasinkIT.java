@@ -22,6 +22,7 @@ import org.apache.http.client.fluent.Executor;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
 import org.datasink.Dataset;
+import org.datasink.DatasetVersion;
 import org.datasink.server.SecurityConfiguration;
 import org.datasink.server.ServerConfiguration;
 import org.junit.runner.RunWith;
@@ -59,14 +60,14 @@ public abstract class AbstractDatasinkIT {
                 .authPreemptive(local);
     }
 
-    protected HttpResponse postDataset(final Dataset ds) throws IOException {
-        return this.executor.execute(Request.Post(serverUrl + "/dataset")
+    protected HttpResponse postDataset(final DatasetVersion ds) throws IOException {
+        return this.executor.execute(Request.Post(serverUrl + "/version")
                     .bodyString(this.mapper.writeValueAsString(ds), ContentType.APPLICATION_JSON))
                 .returnResponse();
     }
 
-    public HttpResponse retrieveDataset(final String id) throws IOException {
-        return this.executor.execute(Request.Get(serverUrl + "/dataset/" + id))
+    public HttpResponse retrieveLatestDatasetVersion(final String id) throws IOException {
+        return this.executor.execute(Request.Get(serverUrl + "/version/" + id))
                 .returnResponse();
     }
 
@@ -74,4 +75,10 @@ public abstract class AbstractDatasinkIT {
         return this.executor.execute(Request.Delete(serverUrl + "/dataset/" + id))
                 .returnResponse();
     }
+
+    public HttpResponse retrieveDataset(String datasetId) throws IOException {
+        return this.executor.execute(Request.Get(serverUrl + "/dataset/" + datasetId))
+                .returnResponse();
+    }
+
 }

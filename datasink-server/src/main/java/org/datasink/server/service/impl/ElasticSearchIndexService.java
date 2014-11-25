@@ -17,10 +17,12 @@ package org.datasink.server.service.impl;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.annotation.PostConstruct;
 
 import org.datasink.Dataset;
+import org.datasink.DatasetVersion;
 import org.datasink.server.service.IndexService;
 import org.elasticsearch.action.get.GetResponse;
 import org.slf4j.Logger;
@@ -36,40 +38,63 @@ public class ElasticSearchIndexService extends AbstractElasticSearchService  imp
 
     private static final Logger log = LoggerFactory.getLogger(ElasticSearchIndexService.class);
 
-    public static final String INDEX_NAME="datasets";
-    public static final String INDEX_TYPE="dataset";
+    public static final String INDEX_DATASET_NAME ="datasets";
+    public static final String INDEX_DATASET_TYPE ="dataset";
+    public static final String INDEX_DATASETVERSION_TYPE ="datasetversion";
 
 
     @PostConstruct
     public void init() {
-        if (!this.indexExists(INDEX_NAME)) {
-            this.createIndex(INDEX_NAME);
-            this.waitForIndex(INDEX_NAME);
+        if (!this.indexExists(INDEX_DATASET_NAME)) {
+            this.createIndex(INDEX_DATASET_NAME);
+            this.waitForIndex(INDEX_DATASET_NAME);
         }
     }
 
     @Override
-    public void saveOrUpdate(final Dataset ds) throws IOException {
+    public void saveOrUpdate(final DatasetVersion version) throws IOException {
 
-        if (this.exists(ds.getId())) {
-            log.debug("Updating existing dataset record " + ds.getId());
+        // store the new version in elasticsearch so it can be referenced
+        this.client.prepareIndex(INDEX_DATASET_NAME, INDEX_DATASETVERSION_TYPE, version.getVersionId())
+                .setSource(this.mapper.writeValueAsBytes(version))
+                .execute()
+                .actionGet();
+
+        final String datasetId = version.getDatasetId();
+        final Dataset ds;
+        if (this.exists(datasetId)) {
+            log.debug("Updating existing dataset record " + datasetId);
+            ds = this.retrieveDataset(datasetId);
+            ds.getVersionIds().put(ds.getVersionIds().size() + 1, version.getVersionId());
         } else {
-            log.debug("Creating new dataset record " + ds.getId());
+            log.debug("Creating new dataset record " + datasetId);
+            ds = new Dataset();
+            ds.setId(datasetId);
+            ds.setVersionIds(new HashMap<>(1));
+            ds.getVersionIds().put(1, version.getVersionId());
         }
 
         // store the serialization in ElasticSearch
-        this.client.prepareIndex(INDEX_NAME, INDEX_TYPE, ds.getId())
+        this.client.prepareIndex(INDEX_DATASET_NAME, INDEX_DATASET_TYPE, ds.getId())
                 .setSource(this.mapper.writeValueAsBytes(ds))
                 .execute()
                 .actionGet();
 
         // refresh the index so the new record is available
-        this.refreshIndex(INDEX_NAME);
+        this.refreshIndex(INDEX_DATASET_NAME);
     }
 
     @Override
     public void delete(final String id) throws IOException {
-        this.client.prepareDelete(INDEX_NAME, INDEX_TYPE, id)
+        final Dataset fetched = this.retrieveDataset(id);
+        // iterate over all the version of the dataset to remove everything
+        for (final String versionId : fetched.getVersionIds().values()) {
+            this.client.prepareDelete(INDEX_DATASET_NAME, INDEX_DATASETVERSION_TYPE, versionId)
+                    .execute()
+                    .actionGet();
+        }
+        // and finally we can remove the dataset object itself
+        this.client.prepareDelete(INDEX_DATASET_NAME, INDEX_DATASET_TYPE, id)
             .execute()
             .actionGet();
     }
@@ -80,8 +105,21 @@ public class ElasticSearchIndexService extends AbstractElasticSearchService  imp
     }
 
     @Override
-    public Dataset retrieve(final String id) throws IOException {
-        final GetResponse get = this.client.prepareGet(INDEX_NAME, INDEX_TYPE, id)
+    public DatasetVersion retrieveDatasetVersion(final String versionId) throws IOException {
+        final GetResponse get = this.client.prepareGet(INDEX_DATASET_NAME, INDEX_DATASETVERSION_TYPE, versionId)
+                .execute()
+                .actionGet();
+
+        if (!get.isExists()) {
+            throw new FileNotFoundException("DatasetVersion " + versionId + " can not be found");
+        }
+
+        return this.mapper.readValue(get.getSourceAsBytes(), DatasetVersion.class);
+    }
+
+    @Override
+    public Dataset retrieveDataset(final String id) throws IOException {
+        final GetResponse get = this.client.prepareGet(INDEX_DATASET_NAME, INDEX_DATASET_TYPE, id)
                 .execute()
                 .actionGet();
 
@@ -94,11 +132,16 @@ public class ElasticSearchIndexService extends AbstractElasticSearchService  imp
 
     @Override
     public boolean exists(final String id) {
-        return this.client.prepareGet(INDEX_NAME, INDEX_TYPE, id)
+        return this.client.prepareGet(INDEX_DATASET_NAME, INDEX_DATASET_TYPE, id)
                 .execute()
                 .actionGet()
                 .isExists();
     }
 
+    @Override
+    public DatasetVersion retrieveLatestDatasetVersion(final String datasetId) throws IOException {
+        final Dataset fetched = this.retrieveDataset(datasetId);
+        return this.retrieveDatasetVersion(fetched.getVersionIds().get(fetched.getVersionIds().size()));
+    }
 
 }

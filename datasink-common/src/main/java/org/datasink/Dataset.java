@@ -27,9 +27,7 @@ import java.util.Map;
 public class Dataset {
 
     private String id;
-    private String label;
-    private int version;
-    private Map<Integer, String> versions;
+    private Map<Integer, String> versionIds;
 
     public String getId() {
         return id;
@@ -39,27 +37,11 @@ public class Dataset {
         this.id = id;
     }
 
-    public String getLabel() {
-        return label;
+    public Map<Integer, String> getVersionIds() {
+        return versionIds;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public int getVersion() {
-        return version;
-    }
-
-    public void setVersion(int version) {
-        this.version = version;
-    }
-
-    public Map<Integer, String> getVersions() {
-        return versions;
-    }
-
-    public void setVersions(Map<Integer, String> versions) {
-        this.versions = versions;
+    public void setVersionIds(Map<Integer, String> versionIds) {
+        this.versionIds = versionIds;
     }
 }
