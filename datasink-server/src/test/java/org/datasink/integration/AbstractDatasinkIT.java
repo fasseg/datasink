@@ -40,7 +40,7 @@ import java.io.IOException;
 @SpringApplicationConfiguration(classes = {ServerConfiguration.class, SecurityConfiguration.class})
 @IntegrationTest
 @WebAppConfiguration
-public class AbstractDatasinkIT {
+public abstract class AbstractDatasinkIT {
     private final String hostName = "localhost";
     private final String contextPath = "/datasink";
     private final int port = 8080;
